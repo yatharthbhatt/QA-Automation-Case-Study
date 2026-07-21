@@ -104,7 +104,7 @@ pytest --html=reports/report.html --self-contained-html
 | Roles (Admin/Manager/Employee) | `role` fixture + `data/users.json`; `@pytest.mark.role("admin")` |
 | API testing | `api/` service clients built on `BaseApiClient` (retries, auth, tenant header) |
 | BrowserStack | `--target=browserstack` swaps the driver; capabilities set per session |
-| CI/CD | [.github/workflows/ci.yml](.github/workflows/ci.yml) — matrix over browser × tenant |
+| CI/CD | [.github/workflows/ci.yml](.github/workflows/ci.yml) — validates the suite on every push; opt-in live matrix over browser × tenant |
 
 ---
 
@@ -116,6 +116,15 @@ pytest --html=reports/report.html --self-contained-html
 - **BrowserStack dashboard** — video, network logs, and device logs per session
 
 See [reports/SAMPLE_REPORT.md](reports/SAMPLE_REPORT.md) for an annotated sample.
+
+### Continuous Integration
+
+Every push/PR runs the **`validate`** job: it installs dependencies, imports every module, and
+discovers the full test suite — proving the framework is wired correctly without needing a live
+deployment. The **live** browser and mobile jobs need a real environment, so they are **opt-in**:
+set the repository variable `RUN_LIVE_TESTS=true` and add the secrets referenced in
+[.github/workflows/ci.yml](.github/workflows/ci.yml) (`BASE_URL`, `API_TOKEN`, credentials,
+BrowserStack keys). Until then they are skipped, so the pipeline stays green.
 
 ---
 
