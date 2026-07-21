@@ -20,8 +20,8 @@ jobs:
         with: { python-version: "3.11" }
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Install Playwright browser
-        run: playwright install --with-deps chromium
+      # No browser binaries needed here: collection imports modules and discovers
+      # tests but never launches a browser.
       - name: Syntax / import check
         run: python -m compileall -q core pages api utils config conftest.py tests
       - name: Test discovery (collect the full suite)
@@ -35,7 +35,7 @@ jobs:
   cross-browser:
     needs: validate
     if: ${{ vars.RUN_LIVE_TESTS == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04   # 22.04 has the system libs Playwright's browser deps need
     strategy:
       fail-fast: false
       matrix:
@@ -72,7 +72,7 @@ jobs:
   mobile-browserstack:
     needs: validate
     if: ${{ vars.RUN_LIVE_TESTS == 'true' && github.event_name == 'schedule' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
