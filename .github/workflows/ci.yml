@@ -1,0 +1,94 @@
+name: QA Automation CI
+
+# Runs on every PR (fast gate) and nightly (full cross-browser/tenant matrix).
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 2 * * *"   # nightly full run at 02:00 UTC
+
+jobs:
+  # ---- Fast PR gate: API + smoke UI on chromium/company1 only. Keeps PRs quick & cheap. ----
+  smoke:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: playwright install --with-deps chromium
+      - name: API + smoke tests
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: pytest -m "api or smoke" --tenant=company1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: smoke-report, path: reports/ }
+
+  # ---- Nightly: full matrix across browsers and tenants (local Playwright). ----
+  cross-browser:
+    if: github.event_name == 'schedule' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+        tenant: [company1, company2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: playwright install --with-deps ${{ matrix.browser }}
+      - name: Run UI + integration
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          TOTP_SECRET: ${{ secrets.TOTP_SECRET }}
+        run: >
+          pytest -m "ui or integration"
+          --browser-name=${{ matrix.browser }}
+          --tenant=${{ matrix.tenant }}
+          -n 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-${{ matrix.browser }}-${{ matrix.tenant }}
+          path: reports/
+
+  # ---- Nightly mobile on BrowserStack real devices. ----
+  mobile-browserstack:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [android, ios]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - name: Run mobile flow on BrowserStack
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          TEST_TARGET: browserstack
+        run: >
+          pytest -m mobile
+          --target=browserstack
+          --bstack-profile=${{ matrix.profile }}

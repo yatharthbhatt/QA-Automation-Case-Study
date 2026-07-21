@@ -1,0 +1,31 @@
+# BrowserStack capability profiles.
+# Selected per session; credentials come from env (see config.py), never committed here.
+
+project: "WorkFlow Pro QA"
+build: "workflowpro-automation"
+
+# Web desktop targets (Playwright connects over CDP to BrowserStack)
+web:
+  chrome:
+    browser: "chrome"
+    os: "Windows"
+    os_version: "11"
+  firefox:
+    browser: "firefox"
+    os: "Windows"
+    os_version: "11"
+  safari:
+    browser: "safari"
+    os: "OS X"
+    os_version: "Sonoma"
+
+# Real mobile devices
+mobile:
+  android:
+    deviceName: "Samsung Galaxy S23"
+    osVersion: "13.0"
+    realMobile: true
+  ios:
+    deviceName: "iPhone 15"
+    osVersion: "17"
+    realMobile: true

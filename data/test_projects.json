@@ -1,0 +1,12 @@
+{
+  "valid_project": {
+    "name": "Test Project",
+    "description": "Created by automated integration test",
+    "team_members": ["manager@company1.com", "employee@company1.com"]
+  },
+  "minimal_project": {
+    "name": "Minimal",
+    "description": "",
+    "team_members": []
+  }
+}

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Env / secrets
+.env
+*.local
+
+# Reports & artifacts (keep the folder, ignore generated output)
+reports/*
+!reports/.gitkeep
+!reports/SAMPLE_REPORT.md
+
+# Playwright
+test-results/
+playwright-report/
+trace.zip
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/

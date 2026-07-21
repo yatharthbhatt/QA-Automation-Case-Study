@@ -1,0 +1,13 @@
+{
+  "_comment": "Passwords/emails are placeholders. Real values are injected per-role from .env / secrets manager at runtime by the `user` fixture; these keys map role -> env var names.",
+  "company1": {
+    "admin":    { "email_env": "ADMIN_EMAIL",    "password_env": "ADMIN_PASSWORD" },
+    "manager":  { "email_env": "MANAGER_EMAIL",  "password_env": "MANAGER_PASSWORD" },
+    "employee": { "email_env": "EMPLOYEE_EMAIL", "password_env": "EMPLOYEE_PASSWORD" }
+  },
+  "company2": {
+    "admin":    { "email_env": "ADMIN_EMAIL",    "password_env": "ADMIN_PASSWORD" },
+    "manager":  { "email_env": "MANAGER_EMAIL",  "password_env": "MANAGER_PASSWORD" },
+    "employee": { "email_env": "EMPLOYEE_EMAIL", "password_env": "EMPLOYEE_PASSWORD" }
+  }
+}

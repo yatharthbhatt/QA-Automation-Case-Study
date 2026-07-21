@@ -1,0 +1,12 @@
+{
+  "company1": {
+    "tenant_id": "company1",
+    "url": "https://company1.workflowpro.com",
+    "display_name": "Company1"
+  },
+  "company2": {
+    "tenant_id": "company2",
+    "url": "https://company2.workflowpro.com",
+    "display_name": "Company2"
+  }
+}
